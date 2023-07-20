@@ -26,14 +26,14 @@
 <meta property="og:site_name" content="linsh">
 <meta property="og:description" content="本项目使用 Spring Boot 实现了一个在线的 Java IDE，允许客户端提交 Java 代码的 main 方法，并在远程服务器上运行。服务器将程序的标准输出内容和运行时异常信息返回给客户端。同时，项目还对客户端提交的程序执行时间进行了限制。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lin-sh.github.io/images%5CjavaIDE%5C0-liucheng.jpg">
-<meta property="og:image" content="https://lin-sh.github.io/images%5CjavaIDE%5C0-chengxvliucheng.jpg">
+<meta property="og:image" content="https://lin-sh.github.io/images/javaIDE/0-liucheng.jpg">
+<meta property="og:image" content="https://lin-sh.github.io/images/javaIDE/0-chengxvliucheng.jpg">
 <meta property="article:published_time" content="2023-07-20T10:22:40.000Z">
-<meta property="article:modified_time" content="2023-07-20T10:31:30.320Z">
+<meta property="article:modified_time" content="2023-07-20T10:36:16.832Z">
 <meta property="article:author" content="林尚辉">
 <meta property="article:tag" content="JAVA">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lin-sh.github.io/images%5CjavaIDE%5C0-liucheng.jpg">
+<meta name="twitter:image" content="https://lin-sh.github.io/images/javaIDE/0-liucheng.jpg">
 
 
 <link rel="canonical" href="https://lin-sh.github.io/2023/07/20/javaIDE-%E7%BB%BC%E8%BF%B0/">
@@ -193,7 +193,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2023-07-20 18:22:40 / 修改时间：18:31:30" itemprop="dateCreated datePublished" datetime="2023-07-20T18:22:40+08:00">2023-07-20</time>
+      <time title="创建时间：2023-07-20 18:22:40 / 修改时间：18:36:16" itemprop="dateCreated datePublished" datetime="2023-07-20T18:22:40+08:00">2023-07-20</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -241,7 +241,7 @@
 <li><strong>解决多用户同时发送执行代码请求时的并发问题</strong>： 通过 ThreadLoacl 实现线程封闭，为每个请求创建一个输出流存储标准输出及标准错误结果；</li>
 </ul>
 <h2 id="项目实现流程"><a href="#项目实现流程" class="headerlink" title="项目实现流程"></a>项目实现流程</h2><h4 id="Java-程序运行全过程"><a href="#Java-程序运行全过程" class="headerlink" title="Java 程序运行全过程"></a>Java 程序运行全过程</h4><p>首先我们看一下java程序从源码到最终运行的整个过程</p>
-<p><img src="/images%5CjavaIDE%5C0-liucheng.jpg"></p>
+<p><img src="/images/javaIDE/0-liucheng.jpg"></p>
 <ol>
 <li>编写Java源代码：首先，开发人员编写Java源代码，使用.java作为文件扩展名。</li>
 <li>编译Java源代码：使用Java编译器（javac）对Java源代码进行编译。编译的过程会将源代码转换为字节码文件（.class文件），字节码是一种中间代码，它不是直接在操作系统上运行，而是在Java虚拟机（JVM）上执行。</li>
@@ -271,7 +271,7 @@
 <p>反射是Java的一项强大功能，它允许程序在运行时动态地获取类的信息和调用类的方法，是实现Java IDE中在线运行代码的重要技术之一。</p>
 <hr>
 <p>通过对Java 程序编译和运行流程进行分析，我们得到以下在线java源代码执行流程：</p>
-<p><img src="/images%5CjavaIDE%5C0-chengxvliucheng.jpg"></p>
+<p><img src="/images/javaIDE/0-chengxvliucheng.jpg"></p>
 <p>通过观察上图可以发现，我们的重点在于实现 <code>编译</code> 和 <code>JVM</code> 两个蓝色方框所指向的类。它们的作用分别为：</p>
 <ul>
 <li><code>编译</code>：将字符串形式的源代码 String source 编译成字节码 byte[] classBytes；</li>
