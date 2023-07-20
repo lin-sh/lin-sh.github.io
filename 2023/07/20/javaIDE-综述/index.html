@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha256-/4UQcSmErDzPCMAiuOiWPVVsNN2s3ZY/NsmXNcj0IFc=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lin-sh.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.15.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"default"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本项目使用 Spring Boot 实现了一个在线的 Java IDE，允许客户端提交 Java 代码的 main 方法，并在远程服务器上运行。服务器将程序的标准输出内容和运行时异常信息返回给客户端。同时，项目还对客户端提交的程序执行时间进行了限制。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="“java在线IDE”">
+<meta property="og:url" content="https://lin-sh.github.io/2023/07/20/javaIDE-%E7%BB%BC%E8%BF%B0/index.html">
+<meta property="og:site_name" content="linsh">
+<meta property="og:description" content="本项目使用 Spring Boot 实现了一个在线的 Java IDE，允许客户端提交 Java 代码的 main 方法，并在远程服务器上运行。服务器将程序的标准输出内容和运行时异常信息返回给客户端。同时，项目还对客户端提交的程序执行时间进行了限制。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lin-sh.github.io/images%5CjavaIDE%5C0-liucheng.jpg">
+<meta property="og:image" content="https://lin-sh.github.io/images%5CjavaIDE%5C0-chengxvliucheng.jpg">
+<meta property="article:published_time" content="2023-07-20T10:22:40.000Z">
+<meta property="article:modified_time" content="2023-07-20T10:24:18.408Z">
+<meta property="article:author" content="林尚辉">
+<meta property="article:tag" content="JAVA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lin-sh.github.io/images%5CjavaIDE%5C0-liucheng.jpg">
+
+
+<link rel="canonical" href="https://lin-sh.github.io/2023/07/20/javaIDE-%E7%BB%BC%E8%BF%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lin-sh.github.io/2023/07/20/javaIDE-%E7%BB%BC%E8%BF%B0/","path":"2023/07/20/javaIDE-综述/","title":"“java在线IDE”"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>“java在线IDE” | linsh</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">linsh</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B6%89%E5%8F%8A%E6%8A%80%E6%9C%AF"><span class="nav-number">1.</span> <span class="nav-text">涉及技术</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E6%A8%A1%E5%9D%97"><span class="nav-number">2.</span> <span class="nav-text">项目模块</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E5%AE%9E%E7%8E%B0%E6%B5%81%E7%A8%8B"><span class="nav-number"></span> <span class="nav-text">项目实现流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Java-%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C%E5%85%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">Java 程序运行全过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">2.</span> <span class="nav-text">编译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C"><span class="nav-number">3.</span> <span class="nav-text">运行</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="林尚辉"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">林尚辉</p>
+  <div class="site-description" itemprop="description">HIT Coder</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a target="_blank" rel="noopener" href="https://demo-public.splab.likole.com/">
+          <span class="site-state-item-name">听觉智能研究中心</span>
+        </a>
+      </div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lin-sh/" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lin-sh&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:linsh@stu.hit.edu.cn" title="E-Mail → mailto:linsh@stu.hit.edu.cn" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lin-sh.github.io/2023/07/20/javaIDE-%E7%BB%BC%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="林尚辉">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="linsh">
+      <meta itemprop="description" content="HIT Coder">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="“java在线IDE” | linsh">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          “java在线IDE”
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-07-20 18:22:40 / 修改时间：18:24:18" itemprop="dateCreated datePublished" datetime="2023-07-20T18:22:40+08:00">2023-07-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%A0%94%E7%A9%B6%E7%94%9F/" itemprop="url" rel="index"><span itemprop="name">研究生</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%A0%94%E7%A9%B6%E7%94%9F/Java-Spring/" itemprop="url" rel="index"><span itemprop="name">Java Spring</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>本项目使用 Spring Boot 实现了一个在线的 Java IDE，允许客户端提交 Java 代码的 main 方法，并在远程服务器上运行。服务器将程序的标准输出内容和运行时异常信息返回给客户端。同时，项目还对客户端提交的程序执行时间进行了限制。</p>
+<span id="more"></span>
+<p>在项目中，涉及到的框架知识相对简单，主要集中在 Java 基础方面。例如，：Java 程序编译和运行的过程、Java 类加载机制、Java 类文件结构、Java 反射等。除此之外，还涉及到了一个简单的并发问题：如何将一个非线程安全的类变为一个线程安全的类。</p>
+<h4 id="涉及技术"><a href="#涉及技术" class="headerlink" title="涉及技术"></a>涉及技术</h4><ul>
+<li><p>Java 动态编译</p>
+</li>
+<li><p>Java 类文件的结构</p>
+</li>
+<li><p>Java 类加载器 &amp; Java 类的热替换</p>
+</li>
+<li><p>Java 反射</p>
+</li>
+<li><p>如何将一个类变为线程安全类</p>
+</li>
+</ul>
+<h4 id="项目模块"><a href="#项目模块" class="headerlink" title="项目模块"></a>项目模块</h4><ul>
+<li><strong>实现编译模块</strong>： 使用动态编译技术，可将客户端发来的源代码字符串直接编译为字节数组；</li>
+<li><strong>实现运行模块</strong>： 自定义类加载器实现类的加载 &amp; 热替换，通过反射实现 main 方法的运行；</li>
+<li><strong>实现自定义System类</strong>： 根据 Java 类文件结构修改类的字节码，可将客户端程序对 System 的调用替换为对 System的替代类 HackSystem 的调用；</li>
+<li><strong>解决多用户同时发送执行代码请求时的并发问题</strong>： 通过 ThreadLoacl 实现线程封闭，为每个请求创建一个输出流存储标准输出及标准错误结果；</li>
+</ul>
+<h2 id="项目实现流程"><a href="#项目实现流程" class="headerlink" title="项目实现流程"></a>项目实现流程</h2><h4 id="Java-程序运行全过程"><a href="#Java-程序运行全过程" class="headerlink" title="Java 程序运行全过程"></a>Java 程序运行全过程</h4><p>首先我们看一下java程序从源码到最终运行的整个过程</p>
+<p><img src="/images%5CjavaIDE%5C0-liucheng.jpg"></p>
+<ol>
+<li>编写Java源代码：首先，开发人员编写Java源代码，使用.java作为文件扩展名。</li>
+<li>编译Java源代码：使用Java编译器（javac）对Java源代码进行编译。编译的过程会将源代码转换为字节码文件（.class文件），字节码是一种中间代码，它不是直接在操作系统上运行，而是在Java虚拟机（JVM）上执行。</li>
+<li>类加载：在Java程序运行时，JVM会负责加载字节码文件到内存中。类加载是Java虚拟机执行的一个过程，它包括三个主要步骤：加载、连接、初始化。加载是指将类的字节码文件加载到JVM中。连接包括验证、准备和解析步骤，其中验证确保字节码的正确性和安全性，准备负责为类的静态变量分配内存并设置默认初始值，解析将符号引用转换为直接引用。初始化阶段是类加载的最后一步，在此阶段，JVM会执行类的初始化代码，为静态变量赋予正确的初始值。</li>
+<li>执行Java程序：类加载完成后，JVM会执行Java程序的main方法作为程序的入口点。在main方法中，Java程序开始执行，按照预定义的逻辑进行运行。</li>
+</ol>
+<p>需要注意的是，Java程序的执行是在Java虚拟机上进行的，这意味着Java是一种解释性语言。JVM会逐行解释字节码并将其转换为本地机器码，然后由底层操作系统执行。</p>
+<p><strong>总的来说：</strong></p>
+<ul>
+<li>源文件由编译器编译成字节码；</li>
+<li>字节码由 Java 虚拟机解释运行。</li>
+</ul>
+<h4 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h4><p>在Java编译过程中，编译器会根据源代码中的依赖关系逐个编译类，并在需要时引用它们。如果在编译过程中找不到所依赖的类的<code>.class</code>文件或<code>.java</code>源文件，编译器将报告“cannot find symbol”的错误。</p>
+<p>这种依赖关系在Java中被称为类的依赖关系图。编译器会根据依赖关系图来确定编译顺序，确保所有的依赖类在需要时都已经编译好并可以访问。	</p>
+<p>例如，假设我们有两个类：<code>ClassA</code>和<code>ClassB</code>，其中<code>ClassA</code>依赖于<code>ClassB</code>。如果我们先编译<code>ClassA.java</code>文件，编译器会检查<code>ClassA</code>的源代码，发现它依赖于<code>ClassB</code>，于是会先编译<code>ClassB.java</code>（如果<code>ClassB</code>尚未编译），然后再编译<code>ClassA.java</code>，确保所有依赖都被满足。</p>
+<p>如果在编译<code>ClassA.java</code>时，编译器找不到<code>ClassB</code>的<code>.class</code>文件或<code>.java</code>源文件，它就会报告“cannot find symbol”的错误，因为它无法解析<code>ClassB</code>类。</p>
+<h4 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h4><p>Java类的运行可以分为两个主要过程：类的加载和类的执行。</p>
+<ol>
+<li>类的加载： 在应用程序运行时，JVM进程会从类路径（classpath）中找到对应的二进制文件（.class文件），并将该类的信息加载到运行时数据区的方法区内。这个过程被称为类的加载。</li>
+</ol>
+<p>类的加载由Java的类加载器（ClassLoader）来完成。类加载器负责将类的字节码文件加载为Java虚拟机中的Class对象，这个Class对象包含了类的各种信息，如类的结构、字段、方法等。加载后的Class对象存放在方法区中，供JVM在运行时使用。</p>
+<p>Java类加载器采用了双亲委派模型，它会优先使用父类加载器尝试加载类。如果父类加载器无法加载该类，再由当前类加载器进行加载。这样确保了类的加载过程的一致性和安全性。</p>
+<ol>
+<li>类的执行： 一旦类加载完成，JVM会找到类中的主函数入口（通常是<code>public static void main(String[] args)</code>方法），并开始执行main函数。类的执行即程序的运行阶段，JVM按照main方法中定义的逻辑开始执行Java程序。</li>
+</ol>
+<p>在本项目中，主要使用了反射来实现类的执行过程。通过反射，我们可以在运行时获取并调用类的方法，这允许程序动态地加载和执行客户端提交的Java代码。</p>
+<p>反射是Java的一项强大功能，它允许程序在运行时动态地获取类的信息和调用类的方法，是实现Java IDE中在线运行代码的重要技术之一。</p>
+<hr>
+<p>通过对Java 程序编译和运行流程进行分析，我们得到以下在线java源代码执行流程：</p>
+<p><img src="/images%5CjavaIDE%5C0-chengxvliucheng.jpg"></p>
+<p>通过观察上图可以发现，我们的重点在于实现 <code>编译</code> 和 <code>JVM</code> 两个蓝色方框所指向的类。它们的作用分别为：</p>
+<ul>
+<li><code>编译</code>：将字符串形式的源代码 String source 编译成字节码 byte[] classBytes；</li>
+<li><code>JVM</code>：将字节码 byte[] classBytes 加载进 JVM，执行其 main 方法，并收集运行输出结果字符串返回。</li>
+</ul>
+<blockquote>
+<p><strong>Note：</strong> 我们只收集 <code>System.out</code> 和 <code>System.err</code> 输出的内容返回给客户端。</p>
+</blockquote>
+<p>接下来，我们将对 两个蓝色方框所指向的类的实现方式进行详解。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/09/05/%E5%AD%90%E7%A9%BA%E9%97%B4%E8%AF%AD%E9%9F%B3%E5%8E%BB%E5%99%AA/" rel="prev" title="子空间语音降噪(with code)">
+                  <i class="fa fa-chevron-left"></i> 子空间语音降噪(with code)
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy;
+  <span class="author" itemprop="copyrightHolder">林尚辉</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
