@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha256-/4UQcSmErDzPCMAiuOiWPVVsNN2s3ZY/NsmXNcj0IFc=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lin-sh.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.15.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":{"enable":true,"style":"default"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="动态编译API在JDK 1.6及以后的版本中，引入了javax.tools包，其中包含了用于在运行时进行动态编译的相关类和接口。通过这些API，开发人员可以在程序运行过程中动态地生成Java源代码，然后通过编译器API将其编译成字节码，最后通过类加载器将生成的类加载到JVM中执行。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linsh">
+<meta property="og:url" content="https://lin-sh.github.io/2023/07/23/javaIDE-%E5%8A%A8%E6%80%81%E7%BC%96%E8%AF%91/index.html">
+<meta property="og:site_name" content="linsh">
+<meta property="og:description" content="动态编译API在JDK 1.6及以后的版本中，引入了javax.tools包，其中包含了用于在运行时进行动态编译的相关类和接口。通过这些API，开发人员可以在程序运行过程中动态地生成Java源代码，然后通过编译器API将其编译成字节码，最后通过类加载器将生成的类加载到JVM中执行。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lin-sh.github.io/images%5CjavaIDE%5C1-dongtbianyi.jpg">
+<meta property="article:published_time" content="2023-07-23T02:24:24.440Z">
+<meta property="article:modified_time" content="2023-07-23T02:25:21.321Z">
+<meta property="article:author" content="林尚辉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lin-sh.github.io/images%5CjavaIDE%5C1-dongtbianyi.jpg">
+
+
+<link rel="canonical" href="https://lin-sh.github.io/2023/07/23/javaIDE-%E5%8A%A8%E6%80%81%E7%BC%96%E8%AF%91/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lin-sh.github.io/2023/07/23/javaIDE-%E5%8A%A8%E6%80%81%E7%BC%96%E8%AF%91/","path":"2023/07/23/javaIDE-动态编译/","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title> | linsh</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">linsh</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E7%BC%96%E8%AF%91API"><span class="nav-number">1.</span> <span class="nav-text">动态编译API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Java%E7%BC%96%E8%AF%91%E5%99%A8API"><span class="nav-number">1.0.1.</span> <span class="nav-text">Java编译器API</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%BE%97%E7%BC%96%E8%AF%91%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">获得编译器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Writer-out"><span class="nav-number">2.0.1.</span> <span class="nav-text">Writer out</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JavaFileManager-fileManager"><span class="nav-number">2.0.2.</span> <span class="nav-text">JavaFileManager fileManager</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DiagnosticListener-lt-super-JavaFileObject-gt-diagnosticListener"><span class="nav-number">2.0.3.</span> <span class="nav-text">DiagnosticListener&lt;? super JavaFileObject&gt; diagnosticListener</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Iterable-options"><span class="nav-number">2.0.4.</span> <span class="nav-text">Iterable options</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Iterable-lt-String-gt-options"><span class="nav-number">2.1.</span> <span class="nav-text">Iterable&lt;String&gt; options</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Iterable-classes"><span class="nav-number">2.1.1.</span> <span class="nav-text">Iterable classes</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Iterable-lt-extends-JavaFileObject-gt-compilationUnits"><span class="nav-number">2.1.2.</span> <span class="nav-text">Iterable&lt;? extends JavaFileObject&gt; compilationUnits</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E7%BC%96%E8%AF%91%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">实现编译器</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="林尚辉"
+      src="/images/head.jpg">
+  <p class="site-author-name" itemprop="name">林尚辉</p>
+  <div class="site-description" itemprop="description">HIT Coder</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a target="_blank" rel="noopener" href="https://demo-public.splab.likole.com/">
+          <span class="site-state-item-name">听觉智能研究中心</span>
+        </a>
+      </div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lin-sh/" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lin-sh&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:linsh@stu.hit.edu.cn" title="E-Mail → mailto:linsh@stu.hit.edu.cn" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lin-sh.github.io/2023/07/23/javaIDE-%E5%8A%A8%E6%80%81%E7%BC%96%E8%AF%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/head.jpg">
+      <meta itemprop="name" content="林尚辉">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="linsh">
+      <meta itemprop="description" content="HIT Coder">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | linsh">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-07-23 10:24:24 / 修改时间：10:25:21" itemprop="dateCreated datePublished" datetime="2023-07-23T10:24:24+08:00">2023-07-23</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="动态编译API"><a href="#动态编译API" class="headerlink" title="动态编译API"></a>动态编译API</h2><p>在JDK 1.6及以后的版本中，引入了<code>javax.tools</code>包，其中包含了用于在运行时进行动态编译的相关类和接口。通过这些API，开发人员可以在程序运行过程中动态地生成Java源代码，然后通过编译器API将其编译成字节码，最后通过类加载器将生成的类加载到JVM中执行。</p>
+<span id="more"></span>
+
+<p>在没有动态编译技术之前，要在运行过程中编译Java源代码，通常需要经历以下步骤：</p>
+<ol>
+<li>将源代码字符串写入一个磁盘上的<code>.java</code>文件：将动态生成的Java源代码保存到磁盘上的一个文件中。</li>
+<li>使用<code>javac</code>命令进行编译：调用外部Java编译器（<code>javac</code>命令）来将<code>.java</code>文件编译为<code>.class</code>文件。</li>
+<li>将编译好的<code>.class</code>文件加载进内存：使用Java的类加载器（通常是<code>ClassLoader</code>的子类）将编译好的<code>.class</code>文件加载到JVM的内存中，以生成相应的<code>Class</code>对象。</li>
+<li>通过<code>Class</code>对象获取并执行相应的方法：一旦有了加载后的<code>Class</code>对象，就可以使用反射等方式调用其中的方法。</li>
+</ol>
+<p>存在问题：</p>
+<ol>
+<li>生成<code>.java</code>和<code>.class</code>文件：在传统的非动态编译方式下，为了编译Java源代码，必须将源代码字符串写入一个<code>.java</code>文件，并通过外部的Java编译器（如<code>javac</code>命令）将其编译成<code>.class</code>文件。这样会在文件系统中生成中间文件，可能会导致磁盘空间的占用和文件管理的复杂性。</li>
+<li>涉及IO操作的耗时：由于涉及将源代码写入文件、编译成字节码文件等IO操作，传统的非动态编译方式可能会导致额外的IO开销，这在大量动态编译的情况下可能会影响性能。</li>
+</ol>
+<p>正因为上述问题，使用传统的非动态编译方式并不总是高效和方便的选择，尤其在需要频繁进行动态编译的情况下，这些IO操作和临时文件管理可能会显著影响应用性能和代码的易读性。</p>
+<p>动态编译技术的引入解决了这些问题。带来了多个优势：</p>
+<ol>
+<li>没有文件生成：由于直接在内存中编译源代码，避免了在磁盘上创建临时<code>.java</code>和<code>.class</code>文件的需求。这有助于保持您的服务器环境的干净，并避免在其中添加不必要的文件。</li>
+<li>没有额外的IO操作：没有文件生成步骤，也就不需要进行读写源代码和字节码文件的IO操作。这使得编译过程更高效和更快速，特别是在频繁或动态生成代码时尤为明显。</li>
+<li>减少复杂性：跳过文件生成和IO操作简化了代码，无需管理临时文件。这使得代码库更加干净，易于维护。</li>
+</ol>
+<p>下边介绍如何使用动态编译API</p>
+<h4 id="Java编译器API"><a href="#Java编译器API" class="headerlink" title="Java编译器API"></a>Java编译器API</h4><p>Java编译器API是指JDK中提供的一组用于在Java应用程序中与Java编译器进行交互的类和接口。这个API允许开发人员在运行时通过编程方式调用Java编译器，从而实现动态编译功能或动态生成Java字节码。</p>
+<p>在JDK中，Java编译器API主要由<code>javax.tools</code>包中的类和接口组成。其中一些重要的类和接口包括：</p>
+<ol>
+<li><code>javax.tools.JavaCompiler</code>: 这是Java编译器的主要接口，它定义了用于编译Java源代码的方法。通过<code>javax.tools.ToolProvider</code>类可以获取<code>JavaCompiler</code>的实例。</li>
+<li><code>javax.tools.ToolProvider</code>: 提供了一些静态方法，用于获取Java编译器和其他工具的实例。</li>
+<li><code>javax.tools.JavaFileObject</code>: 代表Java源文件或类文件的抽象，允许Java编译器在内存中处理Java源代码。</li>
+<li><code>javax.tools.StandardJavaFileManager</code>: 这是一个文件管理器接口，用于管理Java文件对象，例如查找Java源文件或类文件。</li>
+</ol>
+<p>使用Java编译器API，我们可以在Java应用程序中动态地生成Java源代码，然后将其传递给Java编译器进行实时编译。这对于一些特定的用例，如动态生成代码、插件系统或动态加载模块，非常有用。</p>
+<h2 id="获得编译器"><a href="#获得编译器" class="headerlink" title="获得编译器"></a>获得编译器</h2><p>正式开始准备我们自己的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取Java编译器实例</span></span><br><span class="line"><span class="type">JavaCompiler</span> <span class="variable">compiler</span> <span class="operator">=</span> ToolProvider.getSystemJavaCompiler();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (compiler == <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="comment">// Java编译器不可用，处理错误情况</span></span><br><span class="line">    System.out.println(<span class="string">&quot;Java编译器不可用。&quot;</span>);</span><br><span class="line">    <span class="comment">// 终止或采取适当的处理措施</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 准备编译所需的各种入参</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="comment">// 执行编译任务</span></span><br><span class="line">    <span class="type">Boolean</span> <span class="variable">result</span> <span class="operator">=</span> compiler.getTask(<span class="literal">null</span>, manager, collector, options, </span><br><span class="line">                                      <span class="literal">null</span>, Arrays.asList(javaFileObject)).call();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 编译结果处理</span></span><br><span class="line">    <span class="keyword">if</span> (result) &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;编译成功！&quot;</span>);</span><br><span class="line">        <span class="comment">// 在此可以执行后续操作，如加载生成的类并执行。</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;编译失败！&quot;</span>);</span><br><span class="line">        <span class="comment">// 在此可以处理编译错误或采取适当的错误处理措施。</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们发现在执行编译任务的compiler.getTask&#96;方法的参数较多，需要提前准备好一些入参。让我们来看一下这些参数及其作用，并说明如何准备它们：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">JavaCompiler.CompilationTask <span class="title function_">getTask</span><span class="params">(Writer out,</span></span><br><span class="line"><span class="params">                                     JavaFileManager fileManager,</span></span><br><span class="line"><span class="params">                                     DiagnosticListener&lt;? <span class="built_in">super</span> JavaFileObject&gt; diagnosticListener,</span></span><br><span class="line"><span class="params">                                     Iterable&lt;String&gt; options,</span></span><br><span class="line"><span class="params">                                     Iterable&lt;String&gt; classes,</span></span><br><span class="line"><span class="params">                                     Iterable&lt;? extends JavaFileObject&gt; compilationUnits)</span></span><br></pre></td></tr></table></figure>
+
+<p>这个方法一共有 6 个入参，它们分别是：</p>
+<ol>
+<li><code>out</code> (Writer)：这是编译过程中的输出流，用于捕获编译过程中的标准输出和错误输出。为 null 的话就是 System.err。</li>
+<li><code>fileManager</code> (JavaFileManager)：这是编译过程中的文件管理器，用于处理Java文件对象的查找和管理。您可以通过<code>JavaCompiler.getStandardFileManager</code>方法来获取标准的文件管理器实例。</li>
+<li><code>diagnosticListener</code> (DiagnosticListener&lt;? super JavaFileObject&gt;)：这是诊断监听器，用于收集编译时的错误和警告信息。</li>
+<li><code>options</code> (Iterable<String>)：这是编译选项，包含编译时的一些设置。例如，您可以指定编译输出的目录、编译版本等。</li>
+<li><code>classes</code> (Iterable<String>)：这是一个可选参数，代表类名列表。如果不需要特定的类名，可以传入<code>null</code>。</li>
+<li><code>compilationUnits</code> (Iterable&lt;? extends JavaFileObject&gt;)：这是编译的Java源文件对象列表，表示要编译的源代码。您需要将要编译的Java源文件封装成<code>JavaFileObject</code>对象，并以列表形式提供。</li>
+</ol>
+<p>为了能成功的进行编译，我们要按照上面的入参需求，一个一个的构建这些参数对象。我们将按照顺序来一个一个讲解。</p>
+<h4 id="Writer-out"><a href="#Writer-out" class="headerlink" title="Writer out"></a>Writer out</h4><p>我们不需要额外的输出流，System.err就够用，所以这个参数直接给null即可。</p>
+<h4 id="JavaFileManager-fileManager"><a href="#JavaFileManager-fileManager" class="headerlink" title="JavaFileManager fileManager"></a>JavaFileManager fileManager</h4><p><code>JavaFileManager</code>用于处理编译过程中的Java文件对象的查找和管理。它充当编译器和文件系统之间的桥梁，允许编译器与不同的文件系统交互，并能够将源代码和编译结果存储在不同类型的存储介质中，如内存、文件系统或其他自定义存储。</p>
+<p>在动态编译过程中，编译器会将编译生成的字节码存入一个JavaFileObject对象中，而这个JavaFileObject对象是由我们自己编写的。在这个过程中，JavaFileManager的作用非常重要，编译器会调用我们传入的JavaFileManager对象的getJavaFileForOutput方法，这个方法会 new 一个我们写的 TmpJavaFileObject 对象，并把返回给编译器。</p>
+<p>对于 JavaFileManager，我们需要重写以下 2 个方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TmpJavaFileManager</span> <span class="keyword">extends</span> <span class="title class_">ForwardingJavaFileManager</span>&lt;JavaFileManager&gt; &#123;</span><br><span class="line">    <span class="comment">// 自定义Java文件对象的缓存，用于存储编译结果</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, JavaFileObject&gt; fileObjectMap;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="title function_">TmpJavaFileManager</span><span class="params">(JavaFileManager fileManager)</span> &#123;</span><br><span class="line">        <span class="comment">// 调用父类的构造函数，将标准文件管理器传递进来</span></span><br><span class="line">        <span class="built_in">super</span>(fileManager);</span><br><span class="line">        <span class="comment">// 初始化自定义Java文件对象的缓存</span></span><br><span class="line">        <span class="built_in">this</span>.fileObjectMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> JavaFileObject <span class="title function_">getJavaFileForInput</span><span class="params">(JavaFileManager.Location location,</span></span><br><span class="line"><span class="params">                                              String className,</span></span><br><span class="line"><span class="params">                                              JavaFileObject.Kind kind)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="comment">// 在编译过程中，编译器会调用此方法来获取输入的Java文件对象</span></span><br><span class="line">        <span class="type">JavaFileObject</span> <span class="variable">javaFileObject</span> <span class="operator">=</span> fileObjectMap.get(className);</span><br><span class="line">        <span class="keyword">if</span> (javaFileObject == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 如果缓存中没有对应的Java文件对象，则调用父类的方法，让标准文件管理器来查找</span></span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">super</span>.getJavaFileForInput(location, className, kind);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果缓存中有对应的Java文件对象，则直接返回它，避免重复查找</span></span><br><span class="line">        <span class="keyword">return</span> javaFileObject;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> JavaFileObject <span class="title function_">getJavaFileForOutput</span><span class="params">(JavaFileManager.Location location,</span></span><br><span class="line"><span class="params">                                               String className,</span></span><br><span class="line"><span class="params">                                               JavaFileObject.Kind kind,</span></span><br><span class="line"><span class="params">                                               FileObject sibling)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="comment">// 在编译过程中，编译器会调用此方法来获取输出的Java文件对象</span></span><br><span class="line">        <span class="comment">// 创建一个自定义的Java文件对象，并将其存储到缓存中</span></span><br><span class="line">        <span class="type">JavaFileObject</span> <span class="variable">javaFileObject</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TmpJavaFileObject</span>(className, kind);</span><br><span class="line">        fileObjectMap.put(className, javaFileObject);</span><br><span class="line">        <span class="comment">// 返回自定义的Java文件对象，编译结果将被存储在这里</span></span><br><span class="line">        <span class="keyword">return</span> javaFileObject;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Notes：</strong> <code>private static Map&lt;String, JavaFileObject&gt; fileObjectMap = new ConcurrentHashMap&lt;&gt;()</code> 属性用来存放编译好的字节码对象。方便后续操作。</p>
+<h4 id="DiagnosticListener-lt-super-JavaFileObject-gt-diagnosticListener"><a href="#DiagnosticListener-lt-super-JavaFileObject-gt-diagnosticListener" class="headerlink" title="DiagnosticListener&lt;? super JavaFileObject&gt; diagnosticListener"></a>DiagnosticListener&lt;? super JavaFileObject&gt; diagnosticListener</h4><p><code>DiagnosticCollector</code>是Java编译器API中的一个诊断收集器，用于收集编译过程中产生的错误、警告和提示信息。通过创建一个<code>DiagnosticCollector</code>对象，我们可以在动态编译过程中收集编译的诊断信息，并根据这些信息判断编译是否成功，以及查看可能存在的错误和警告。</p>
+<p>直接 new 一个就可以，主要用来告诉我们编译是成功了还是失败了，以及警告信息之类的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DiagnosticCollector&lt;JavaFileObject&gt; collector = <span class="keyword">new</span> <span class="title class_">DiagnosticCollector</span>&lt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<h4 id="Iterable-options"><a href="#Iterable-options" class="headerlink" title="Iterable options"></a>Iterable<String> options</h4><h3 id="Iterable-lt-String-gt-options"><a href="#Iterable-lt-String-gt-options" class="headerlink" title="Iterable&lt;String&gt; options"></a><code>Iterable&lt;String&gt; options</code></h3><p>这个就是我们在使用 javac 命令时，可以添加的选项，比如编译目标，输出路径，类路径等，不需要的话可以传入 null。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; options = new ArrayList&lt;&gt;();</span><br><span class="line">options.add(&quot;-target&quot;);</span><br><span class="line">options.add(&quot;1.8&quot;);</span><br><span class="line">options.add(&quot;-d&quot;);</span><br><span class="line">options.add(&quot;/&quot;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="Iterable-classes"><a href="#Iterable-classes" class="headerlink" title="Iterable classes"></a>Iterable<String> classes</h4><p>没有特殊的类名，传入null即可</p>
+<h4 id="Iterable-lt-extends-JavaFileObject-gt-compilationUnits"><a href="#Iterable-lt-extends-JavaFileObject-gt-compilationUnits" class="headerlink" title="Iterable&lt;? extends JavaFileObject&gt; compilationUnits"></a>Iterable&lt;? extends JavaFileObject&gt; compilationUnits</h4><p>通过将要编译的Java源代码单元传递给<code>compilationUnits</code>参数，我们可以告诉编译器需要编译哪些Java文件。这些Java源代码单元可以是通过<code>JavaFileManager.getJavaFileForInput</code>方法获取的文件对象，也可以是自定义的<code>JavaFileObject</code>对象。</p>
+<p>在动态编译中，通常将要编译的Java源代码表示为一组<code>JavaFileObject</code>对象，并将它们传递给编译器的<code>compilationUnits</code>参数。编译器将根据这些源代码单元执行编译操作，并生成相应的字节码。</p>
+<p>为了使其他操作更方便，我们可以通过继承 <code>SimpleJavaFileObject</code> 来实现我们自己的 <code>JavaFileObject</code>。为了知道我们都需要重写 SimpleJavaFileObject 的哪些方法，我们首先需要看一下 compiler.getTask(…).call() 的执行流程，看看都需要用到什么方法。 <code>compiler.getTask(...).call()</code> 的执行流程如下图所示：</p>
+<p><img src="/images%5CjavaIDE%5C1-dongtbianyi.jpg"></p>
+<p><strong>执行流程说明：</strong></p>
+<ul>
+<li><p>当我们进行动态编译时，首先需要获取源码，这就好比我们拿着一本书，才能开始阅读。编译器会通过<code>JavaFileObject</code>的<code>getCharContent</code>方法，得到源码的内容，就像翻开书页看书一样。</p>
+</li>
+<li><p>然后，编译器会对得到的源码进行编译，就像把书中的内容理解并转换成我们能听懂的语言。编译器将生成字节码，就像把书中的内容转换成我们能听懂的话语，并且将得到的字节码封装进一个新的<code>JavaFileObject</code>对象。编译器会把生成的字节码存放在一个特殊的地方，类似于将新的内容记录在纸上。但这个地方不是我们自己写的，它是由我们提供的<code>JavaFileManager</code>来管理的，就像我们把内容记录在我们自己的笔记本上。</p>
+</li>
+<li><p>这时，<code>JavaFileManager</code>登场了！编译器会调用我们传入的<code>JavaFileManager</code>的<code>getJavaFileForOutput</code>方法，就像请求我们打开一个新的笔记本。这个方法会创建一个我们自己写的<code>TmpJavaFileObject</code>对象，并把它返回给编译器，就像我们打开了一本新的笔记本准备记录内容。</p>
+</li>
+<li><p>然后，编译器会把生成的字节码放进我们提供的<code>TmpJavaFileObject</code>对象中，就像我们把内容记录在我们自己的笔记本上。为了能容纳这些字节码，我们在<code>TmpJavaFileObject</code>中添加了一个“容器”，类似于笔记本上的一页空白纸。为了更好地存储字节码，我们在<code>TmpJavaFileObject</code>中加入了一个<code>ByteArrayOutputStream</code>属性，就像在笔记本上准备了一个专门的空间来写字节码。</p>
+</li>
+<li><p>编译器会调用<code>openOutputStream()</code>方法，就像请我们打开笔记本上的一页空白纸，并将字节码写在上面。编译器将把生成的字节码写入到我们提供的“纸上”，也就是<code>ByteArrayOutputStream</code>容器中。最后，为了得到最终的结果，我们需要将这些字节码从“纸上”取下来，就像我们需要把内容从笔记本上拿出来查看一样。我们通过在<code>TmpJavaFileObject</code>中添加一个<code>getCompiledBytes()</code>方法，将<code>ByteArrayOutputStream</code>中的字节码转换成<code>byte[]</code>字节数组，并将它返回。</p>
+</li>
+</ul>
+<p>这样，我们就成功地进行了动态编译，并获得了编译生成的字节码。这种灵活的动态编译技术，就像是我们在阅读和记录新的内容时，有了自己的特定方式，让整个过程更加顺利和高效。</p>
+<p>所以，我们实现的 SimpleJavaFileObject 的子类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">TmpJavaFileObject</span> <span class="keyword">extends</span> <span class="title class_">SimpleJavaFileObject</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String source;</span><br><span class="line">    <span class="keyword">private</span> ByteArrayOutputStream outputStream;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 构造用来存储源代码的JavaFileObject</span></span><br><span class="line"><span class="comment">     * 需要传入源码source，然后调用父类的构造方法创建kind = Kind.SOURCE的JavaFileObject对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TmpJavaFileObject</span><span class="params">(String name, String source)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(URI.create(<span class="string">&quot;String:///&quot;</span> + name + Kind.SOURCE.extension), Kind.SOURCE);</span><br><span class="line">        <span class="built_in">this</span>.source = source;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 构造用来存储字节码的JavaFileObject</span></span><br><span class="line"><span class="comment">	 * 需要传入kind，即我们想要构建一个存储什么类型文件的JavaFileObject</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TmpJavaFileObject</span><span class="params">(String name, Kind kind)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(URI.create(<span class="string">&quot;String:///&quot;</span> + name + Kind.SOURCE.extension), kind);</span><br><span class="line">        <span class="built_in">this</span>.source = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> CharSequence <span class="title function_">getCharContent</span><span class="params">(<span class="type">boolean</span> ignoreEncodingErrors)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="keyword">if</span> (source == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;source == null&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> source;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> OutputStream <span class="title function_">openOutputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        outputStream = <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="keyword">return</span> outputStream;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">byte</span>[] getCompiledBytes() &#123;</span><br><span class="line">        <span class="keyword">return</span> outputStream.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="实现编译器"><a href="#实现编译器" class="headerlink" title="实现编译器"></a>实现编译器</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StringSourceCompiler</span> &#123;</span><br><span class="line">    <span class="comment">// 用于存储编译生成的字节码的映射，类名 -&gt; JavaFileObject</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, JavaFileObject&gt; fileObjectMap = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用正则表达式预编译功能，用于从源码字符串中匹配类名</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">Pattern</span> <span class="variable">CLASS_PATTERN</span> <span class="operator">=</span> Pattern.compile(<span class="string">&quot;class\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)\\s*&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 对传入的源码进行编译，返回编译生成的字节码的字节数组</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> source           源码字符串</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> compileCollector 用于收集编译诊断信息的DiagnosticCollector</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 编译生成的字节码的字节数组，若编译失败或没有有效的字节码则返回null</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] compile(String source, DiagnosticCollector&lt;JavaFileObject&gt; compileCollector) &#123;</span><br><span class="line">        <span class="comment">// 获取系统的Java编译器</span></span><br><span class="line">        <span class="type">JavaCompiler</span> <span class="variable">compiler</span> <span class="operator">=</span> ToolProvider.getSystemJavaCompiler();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建一个自定义的JavaFileManager来管理JavaFileObject对象</span></span><br><span class="line">        <span class="type">JavaFileManager</span> <span class="variable">javaFileManager</span> <span class="operator">=</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">TmpJavaFileManager</span>(compiler.getStandardFileManager(compileCollector, <span class="literal">null</span>, <span class="literal">null</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 从源码字符串中匹配类名</span></span><br><span class="line">        <span class="type">Matcher</span> <span class="variable">matcher</span> <span class="operator">=</span> CLASS_PATTERN.matcher(source);</span><br><span class="line">        String className;</span><br><span class="line">        <span class="keyword">if</span> (matcher.find()) &#123;</span><br><span class="line">            className = matcher.group(<span class="number">1</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;No valid class&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 把源码字符串构造成JavaFileObject，供编译使用</span></span><br><span class="line">        <span class="type">JavaFileObject</span> <span class="variable">sourceJavaFileObject</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TmpJavaFileObject</span>(className, source);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 执行编译任务，编译器将会调用TmpJavaFileManager的getJavaFileForOutput方法获取输出文件对象</span></span><br><span class="line">        <span class="type">Boolean</span> <span class="variable">result</span> <span class="operator">=</span> compiler.getTask(<span class="literal">null</span>, javaFileManager, compileCollector,</span><br><span class="line">                <span class="literal">null</span>, <span class="literal">null</span>, Arrays.asList(sourceJavaFileObject)).call();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取编译生成的字节码的JavaFileObject对象</span></span><br><span class="line">        <span class="type">JavaFileObject</span> <span class="variable">bytesJavaFileObject</span> <span class="operator">=</span> fileObjectMap.get(className);</span><br><span class="line">        <span class="keyword">if</span> (result &amp;&amp; bytesJavaFileObject != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 从自定义JavaFileObject中获取编译生成的字节码的字节数组</span></span><br><span class="line">            <span class="keyword">return</span> ((TmpJavaFileObject) bytesJavaFileObject).getCompiledBytes();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 管理JavaFileObject对象的工具，用于在内存中管理源码和字节码的对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">TmpJavaFileManager</span> <span class="keyword">extends</span> <span class="title class_">ForwardingJavaFileManager</span>&lt;JavaFileManager&gt; &#123;</span><br><span class="line">        <span class="keyword">protected</span> <span class="title function_">TmpJavaFileManager</span><span class="params">(JavaFileManager fileManager)</span> &#123;</span><br><span class="line">            <span class="built_in">super</span>(fileManager);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> JavaFileObject <span class="title function_">getJavaFileForInput</span><span class="params">(JavaFileManager.Location location, String className, JavaFileObject.Kind kind)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">            <span class="type">JavaFileObject</span> <span class="variable">javaFileObject</span> <span class="operator">=</span> fileObjectMap.get(className);</span><br><span class="line">            <span class="keyword">if</span> (javaFileObject == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 如果没有找到对应的JavaFileObject，交由父类的默认处理</span></span><br><span class="line">                <span class="keyword">return</span> <span class="built_in">super</span>.getJavaFileForInput(location, className, kind);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果找到对应的JavaFileObject，返回它供编译器使用</span></span><br><span class="line">            <span class="keyword">return</span> javaFileObject;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> JavaFileObject <span class="title function_">getJavaFileForOutput</span><span class="params">(JavaFileManager.Location location, String className, JavaFileObject.Kind kind, FileObject sibling)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">            <span class="comment">// 创建一个新的自定义JavaFileObject，用于存储编译生成的字节码</span></span><br><span class="line">            <span class="type">JavaFileObject</span> <span class="variable">javaFileObject</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TmpJavaFileObject</span>(className, kind);</span><br><span class="line">            <span class="comment">// 将新的JavaFileObject加入到映射中，供编译器在之后存储编译结果</span></span><br><span class="line">            fileObjectMap.put(className, javaFileObject);</span><br><span class="line">            <span class="keyword">return</span> javaFileObject;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 用来封装表示源码与字节码的对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">TmpJavaFileObject</span> <span class="keyword">extends</span> <span class="title class_">SimpleJavaFileObject</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> String source;</span><br><span class="line">        <span class="keyword">private</span> ByteArrayOutputStream outputStream;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 构造用来存储源代码的JavaFileObject</span></span><br><span class="line"><span class="comment">         * 需要传入源码source，然后调用父类的构造方法创建kind = Kind.SOURCE的JavaFileObject对象</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">TmpJavaFileObject</span><span class="params">(String name, String source)</span> &#123;</span><br><span class="line">            <span class="comment">// 创建URI表示的虚拟文件用于存储源码内容</span></span><br><span class="line">            <span class="built_in">super</span>(URI.create(<span class="string">&quot;String:///&quot;</span> + name + Kind.SOURCE.extension), Kind.SOURCE);</span><br><span class="line">            <span class="built_in">this</span>.source = source;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 构造用来存储字节码的JavaFileObject</span></span><br><span class="line"><span class="comment">         * 需要传入kind，即我们想要构建一个存储什么类型文件的JavaFileObject</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">TmpJavaFileObject</span><span class="params">(String name, Kind kind)</span> &#123;</span><br><span class="line">            <span class="comment">// 创建URI表示的虚拟文件用于存储字节码内容</span></span><br><span class="line">            <span class="built_in">super</span>(URI.create(<span class="string">&quot;String:///&quot;</span> + name + Kind.SOURCE.extension), kind);</span><br><span class="line">            <span class="built_in">this</span>.source = <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> CharSequence <span class="title function_">getCharContent</span><span class="params">(<span class="type">boolean</span> ignoreEncodingErrors)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">            <span class="keyword">if</span> (source == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;source == null&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> source;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> OutputStream <span class="title function_">openOutputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">            <span class="comment">// 创建用于存储字节码的输出流，编译器会把编译生成的字节码写入这个输出流中</span></span><br><span class="line">            outputStream = <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">            <span class="keyword">return</span> outputStream;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 获取编译生成的字节码的字节数组</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@return</span> 编译生成的字节码的字节数组</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">public</span> <span class="type">byte</span>[] getCompiledBytes() &#123;</span><br><span class="line">            <span class="keyword">return</span> outputStream.toByteArray();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/07/20/javaIDE-%E5%AF%BC%E8%A8%80/" rel="prev" title="java在线IDE">
+                  <i class="fa fa-chevron-left"></i> java在线IDE
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy;
+  <span class="author" itemprop="copyrightHolder">林尚辉</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
